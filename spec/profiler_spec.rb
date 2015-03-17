@@ -1,17 +1,17 @@
 require 'spec_helper'
 
-describe Hubberlyzer do
-  it 'has a version number' do
+describe "Profiler" do
+  it "has a version number" do
     expect(Hubberlyzer::VERSION).not_to be nil
   end
 
-  it 'fetches staff listings' do
+  it "fetches staff listings" do
   	p = Hubberlyzer::Profiler.new
   	links = p.githubber_links("https://github.com/about/team")
     expect(links).not_to eq(0)
   end
 
-  it 'fetches user profile information correctly' do
+  it "fetches user profile information correctly" do
   	p = Hubberlyzer::Profiler.new
   	body = p.send(:fetch, "https://github.com/defunkt?tab=repositories")
   	profile = p.parse_profile(Nokogiri::HTML(body))
@@ -25,7 +25,7 @@ describe Hubberlyzer do
   	)
   end
 
-  it 'fetches user repositories stats correctly' do
+  it "fetches user repositories stats correctly" do
   	p = Hubberlyzer::Profiler.new
   	body = p.send(:fetch, "https://github.com/steventen?tab=repositories")
   	repo_count = p.parse_repo(Nokogiri::HTML(body))
