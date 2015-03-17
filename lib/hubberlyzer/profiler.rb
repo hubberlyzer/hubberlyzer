@@ -20,16 +20,23 @@ module Hubberlyzer
 		def fetch_profile_page(url)
 			response_body = fetch(url)
 
-			html = Nokogiri::HTML(response_body)
-			profile = parse_profile(html)
-			lang_count = parse_repo(html)
-
-			{"profile" => profile, "stats" => lang_count}
+			parse_page(response_body)
 		end
 
 		# Fetch array of urls concurrently
 		def fetch_profile_pages(urls)
-			
+			responses = fetch(urls)
+			responses.map do |response_body|
+				parse_page(response_body)
+			end
+		end
+
+		def parse_page(body)
+			html = Nokogiri::HTML(body)
+			profile = parse_profile(html)
+			lang_count = parse_repo(html)
+
+			{"profile" => profile, "stats" => lang_count}
 		end
 		
 		def parse_profile(html)
@@ -74,7 +81,7 @@ module Hubberlyzer
 			hubbers.each do |hubber|
 				link = hubber['href']
 				if link
-					links << (link[0] == '/' ? "https://github.com#{link}" : link)
+					links << (link[0] == '/' ? "https://github.com#{link}?tab=repositories" : link)
 				else
 					puts "Error! Could not find href using #{selector}"
 				end
@@ -84,9 +91,15 @@ module Hubberlyzer
 
 		private
 
-		def fetch(url)
-			fetcher = Hubberlyzer::Fetcher.new(url)
-			response_body = fetcher.fetch_page
+		# If the url is String, then use normal request
+		# If the url is Array, then use concurrent model.
+		def fetch(url, options={})
+			fetcher = Hubberlyzer::Fetcher.new(url, options)
+			if url.is_a? Array
+				response_body = fetcher.fetch_pages
+			else
+				response_body = fetcher.fetch_page
+			end
 		end
 	end
 end

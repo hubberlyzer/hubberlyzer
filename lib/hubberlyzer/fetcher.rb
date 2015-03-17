@@ -13,11 +13,41 @@ module Hubberlyzer
 		def initialize(url, options={})
 			@init_url = url
 			@user_agent = options[:user_agent] || UA.sample
+			@max_concurrency = options[:max_concurrency] || 5
 		end
 
 		def fetch_page
+			request = init_request(init_url)
+			request.run
+			request.response.body
+		end
+
+		def fetch_pages
+			urls = init_url
+			
+			hydra = Typhoeus::Hydra.new(max_concurrency: @max_concurrency)
+
+			requests = urls.map do |url|
+				request = init_request(url)
+				hydra.queue(request)
+				request
+			end
+
+			hydra.run
+
+			responses = requests.map do |request|
+			  request.response.body
+			end
+
+			responses
+		end
+
+		private
+
+		# Create an request instance with callbacks
+		def init_request(url)
 			request = Typhoeus::Request.new(
-				init_url,
+				url,
 				method: :get,
 				headers: {'User-Agent' => user_agent}, 
 				followlocation: true
@@ -38,9 +68,7 @@ module Hubberlyzer
 			  end
 			end
 
-			request.run
-
-			request.response.body
+			request
 		end
 	end
 end
