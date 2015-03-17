@@ -12,12 +12,24 @@
 module Hubberlyzer
 	class Profiler
 
-		def fetch_profile_page(url)
-			fetcher = Hubberlyzer::Fetcher.new(url)
-			response_body = fetcher.fetch_page
+		def githubber_links(url)
+			response_body = fetch(url)
+			parse_hubbers(Nokogiri::HTML(response_body))
+		end
 
-			# html = Nokogiri::HTML(body)
-			# parse_profile(html)
+		def fetch_profile_page(url)
+			response_body = fetch(url)
+
+			html = Nokogiri::HTML(response_body)
+			profile = parse_profile(html)
+			lang_count = parse_repo(html)
+
+			{"profile" => profile, "stats" => lang_count}
+		end
+
+		# Fetch array of urls concurrently
+		def fetch_profile_pages(urls)
+			
 		end
 		
 		def parse_profile(html)
@@ -51,6 +63,30 @@ module Hubberlyzer
 				end
 			end
 			lang_count
+		end
+
+		# Get githubbers' profile url
+		def parse_hubbers(html)
+			links = []
+			selector = "li.hubbers-list-item > a"
+
+			hubbers = html.css(selector)
+			hubbers.each do |hubber|
+				link = hubber['href']
+				if link
+					links << (link[0] == '/' ? "https://github.com#{link}" : link)
+				else
+					puts "Error! Could not find href using #{selector}"
+				end
+			end
+			links
+		end
+
+		private
+
+		def fetch(url)
+			fetcher = Hubberlyzer::Fetcher.new(url)
+			response_body = fetcher.fetch_page
 		end
 	end
 end

@@ -6,13 +6,14 @@ describe Hubberlyzer do
   end
 
   it 'fetches staff listings' do
-    links = Hubberlyzer::Fetcher.new("https://github.com/about/team").githubber_links
+  	p = Hubberlyzer::Profiler.new
+  	links = p.githubber_links("https://github.com/about/team")
     expect(links).not_to eq(0)
   end
 
-  it 'fetches user profile page' do
+  it 'fetches user profile information correctly' do
   	p = Hubberlyzer::Profiler.new
-  	body = p.fetch_profile_page("https://github.com/defunkt")
+  	body = p.send(:fetch, "https://github.com/defunkt")
   	profile = p.parse_profile(Nokogiri::HTML(body))
   	expect(profile).to include(
   		"fullname" => "Chris Wanstrath",
@@ -24,10 +25,16 @@ describe Hubberlyzer do
   	)
   end
 
-  it 'fetches user repositories and calculates the count' do
+  it 'fetches user repositories stats correctly' do
   	p = Hubberlyzer::Profiler.new
-  	body = p.fetch_profile_page("https://github.com/steventen?tab=repositories")
+  	body = p.send(:fetch, "https://github.com/steventen?tab=repositories")
   	repo_count = p.parse_repo(Nokogiri::HTML(body))
   	expect(repo_count).to include("Ruby")
+	end
+
+	it "fetches all the information from profile page" do
+		p = Hubberlyzer::Profiler.new
+		info = p.fetch_profile_page("https://github.com/steventen?tab=repositories")
+		expect(info).to include("profile", "stats")
 	end
 end

@@ -6,5 +6,6 @@ require 'hubberlyzer/profiler'
 require "hubberlyzer/version"
 
 module Hubberlyzer
-  # Your code goes here...
+  class ResponseError < StandardError
+	end
 end
