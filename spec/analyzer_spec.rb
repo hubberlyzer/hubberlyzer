@@ -37,9 +37,9 @@ describe "Analyzer" do
     expect(sum["JavaScript"]["star"]).to eq(10)
   end
 
-  it "calculate member_contribute_to_language" do
+  it "calculate member's contribution to a language" do
     p = Hubberlyzer::Analyzer.new(test_data)
-    sum = p.member_contribute_to_language("Ruby", "star")
+    sum = p.member_contrib("Ruby", "star")
 
     expect(sum.length).to eq(2)
     expect(sum[0]["username"]).to eq("bbb")

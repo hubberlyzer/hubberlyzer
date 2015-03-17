@@ -19,7 +19,7 @@ module Hubberlyzer
 		# Return a list of people, who contribute to this lang
 		# The contribution can either based on 'count', or 'star'
 		# The list is ordered by total of 'count' or 'star' they have
-		def member_contribute_to_language(lang, base="star")
+		def member_contrib(lang, base="star")
 			member = []
 			@data.each do |p|
 				next unless p["stats"].has_key?(lang)
@@ -34,10 +34,6 @@ module Hubberlyzer
 				member.sort! { |a, b|  b[base] <=> a[base] }
 			end
 			member
-		end
-
-		def member_order_by_star
-			
 		end
 	end
 end

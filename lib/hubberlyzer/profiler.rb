@@ -59,14 +59,20 @@ module Hubberlyzer
 				next if stats.length != 3 #assume the language part is missing
 
 				lang = stats[0].strip
-				star = stats[1].strip
+				star = stats[1].strip.to_i # this may cause problem, since Ruby tries to convert any string to number, and will return 0 if it's not a number
+
+				# exclude forked repo with 0 star.
+				if star == 0 && is_forked(repo)
+					next
+				end
+
 				if lang_count.has_key?(lang)
 					lang_count[lang]["count"] += 1
-					lang_count[lang]["star"] += star.to_i # this may cause problem, since Ruby tries to convert any string to number, and will return 0 if it's not a number
+					lang_count[lang]["star"] += star
 				else
 					lang_count[lang] = {}
 					lang_count[lang]["count"] = 1
-					lang_count[lang]["star"] = star.to_i
+					lang_count[lang]["star"] = star
 				end
 			end
 			lang_count
@@ -100,6 +106,10 @@ module Hubberlyzer
 			else
 				response_body = fetcher.fetch_page
 			end
+		end
+
+		def is_forked(node)
+			node["class"].include?("fork")
 		end
 	end
 end
