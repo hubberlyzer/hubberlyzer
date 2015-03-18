@@ -58,12 +58,12 @@ module Hubberlyzer
 		
 		def parse_profile(html)
 			profile = {}
-			profile["fullname"]  = html.at_css('.vcard-fullname').text
-			profile["username"]  = html.at_css('.vcard-username').text
-			profile["location"]  = html.at_xpath("//*[@class='vcard-details']/li[2]").text
-			profile["email"]     = html.at_xpath("//*[@class='vcard-details']/li[3]").text
-			profile["link"]      = html.at_xpath("//*[@class='vcard-details']/li[4]").text
-			profile["join_date"] = html.xpath("//*[@class='join-date']/@datetime").first.value
+			profile["username"]  = html.at_css('.vcard-username').text # Must have username, will raise error is not found
+			profile["fullname"]  = (node = html.at_css('.vcard-fullname')).nil? ? "" : node.text
+			profile["location"]  = (node = html.at_xpath("//*[@class='vcard-details']/li[2]")).nil? ? "" : node.text
+			profile["email"]     = (node = html.at_xpath("//*[@class='vcard-details']/li[3]")).nil? ? "" : node.text
+			profile["link"]      = (node = html.at_xpath("//*[@class='vcard-details']/li[4]")).nil? ? "" : node.text
+			profile["join_date"] = (node = html.xpath("//*[@class='join-date']/@datetime").first).nil? ? "" : node.value
 			profile
 		end
 
