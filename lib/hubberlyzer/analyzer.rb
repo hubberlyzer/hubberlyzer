@@ -8,6 +8,7 @@ module Hubberlyzer
 		end
 
 		# Total count and star of repositories group by language of all member
+		# Return a Hash
 		def sum_by_language
 			sum = {}
 			@data.each do |p|
@@ -16,6 +17,23 @@ module Hubberlyzer
 				end
 			end
 			sum
+		end
+
+		# Total count and star of repositories group by language of all member
+		# Only top x number of language is kept with desc order
+		# Return an Array
+		def top_language(base="count", top=30)
+			sum = {}
+			@data.each do |p|
+				p["stats"].each do |k, v|
+					if sum.has_key?(k)
+						sum[k] += v[base]
+					else
+						sum[k] = v[base]
+					end
+				end
+			end
+			sum.sort_by{ |k, v| -1*v }[0...top]
 		end
 
 		# Return a list of people, who contribute to this lang
