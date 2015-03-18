@@ -5,10 +5,10 @@ describe "Profiler" do
     expect(Hubberlyzer::VERSION).not_to be nil
   end
 
-  it "fetches staff listings" do
+  it "fetches all people's profile urls under the organization" do
   	p = Hubberlyzer::Profiler.new
-  	links = p.githubber_links("https://github.com/about/team")
-    expect(links).not_to eq(0)
+  	links = p.githubber_links("https://github.com/orgs/github/people", 4)
+    expect(links.length).to eq(4*30)
   end
 
   it "fetches user profile information correctly" do

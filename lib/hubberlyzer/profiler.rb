@@ -11,12 +11,27 @@
 #   language usage count
 module Hubberlyzer
 	class Profiler
-
-		def githubber_links(url)
-			response_body = fetch(url)
-			parse_hubbers(Nokogiri::HTML(response_body))
+		# url: the link to organization's people page (e.g. https://github.com/orgs/github/people)
+		# returns all the memeber's profile page url
+		# Notice that currently it will not try to detect the max page.
+		# It will only fetch the first page if max_page is nil.
+		def githubber_links(url, max_page=nil)
+			links = []
+			if max_page && max_page > 1
+				# add pagination param
+				urls = (1..max_page).map { |i| "#{url}?page=#{i}" }
+				responses = fetch(urls, max_concurrency: 2)
+				responses.each do |response_body|
+					links += parse_hubbers(Nokogiri::HTML(response_body))
+				end
+			else
+				response_body = fetch(url)
+				links = parse_hubbers(Nokogiri::HTML(response_body))
+			end
+			links
 		end
 
+		# Fetch a user's profile page
 		def fetch_profile_page(url)
 			response_body = fetch(url)
 
@@ -81,7 +96,7 @@ module Hubberlyzer
 		# Get githubbers' profile url
 		def parse_hubbers(html)
 			links = []
-			selector = "li.hubbers-list-item > a"
+			selector = "li.member-list-item a.member-link"
 
 			hubbers = html.css(selector)
 			hubbers.each do |hubber|

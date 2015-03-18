@@ -1,10 +1,12 @@
 module Hubberlyzer
 	class Analyzer
+		
 		# The data collection is coming from Profiler#fetch_profile_pages method
 		# Check spec/fixtures/sample.rb to see how it looks like
 		def initialize(data)
 			@data = data
 		end
+
 		# Total count and star of repositories group by language of all member
 		def sum_by_language
 			sum = {}
