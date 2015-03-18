@@ -33,6 +33,7 @@ module Hubberlyzer
 
 		# Fetch a user's profile page
 		def fetch_profile_page(url)
+			url = "#{url}?tab=repositories"
 			response_body = fetch(url)
 
 			parse_page(response_body)
@@ -40,6 +41,7 @@ module Hubberlyzer
 
 		# Fetch array of urls concurrently
 		def fetch_profile_pages(urls)
+			urls = urls.map { |l| "#{l}?tab=repositories" }
 			responses = fetch(urls)
 			responses.map do |response_body|
 				parse_page(response_body)
@@ -102,7 +104,7 @@ module Hubberlyzer
 			hubbers.each do |hubber|
 				link = hubber['href']
 				if link
-					links << (link[0] == '/' ? "https://github.com#{link}?tab=repositories" : link)
+					links << (link[0] == '/' ? "https://github.com#{link}" : link)
 				else
 					puts "Error! Could not find href using #{selector}"
 				end
