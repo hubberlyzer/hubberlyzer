@@ -64,8 +64,8 @@ describe "Analyzer" do
     sum = p.member_contrib("Ruby", "star")
 
     expect(sum.length).to eq(2)
-    expect(sum[0]["username"]).to eq("bbb")
-    expect(sum[1]["username"]).to eq("aaa")
+    expect(sum[0]["profile"]["username"]).to eq("bbb")
+    expect(sum[1]["profile"]["username"]).to eq("aaa")
 
     expect(sum[0]["star"]).to eq(10)
     expect(sum[1]["star"]).to eq(0)

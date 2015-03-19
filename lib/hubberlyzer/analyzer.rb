@@ -44,9 +44,8 @@ module Hubberlyzer
 			@data.each do |p|
 				next unless p["stats"].has_key?(lang)
 
-				username = p["profile"]["username"]
 				counter = p["stats"][lang][base]
-				member << { "username" => username, base => counter }
+				member << { "profile" => p["profile"], base => counter }
 			end
 
 			if !member.empty? && member.length > 1
