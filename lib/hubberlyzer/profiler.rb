@@ -78,8 +78,8 @@ module Hubberlyzer
 				lang = stats[0].strip
 				star = stats[1].strip.to_i # this may cause problem, since Ruby tries to convert any string to number, and will return 0 if it's not a number
 
-				# exclude forked repo with 0 star.
-				if star == 0 && is_forked(repo)
+				# exclude forked repo with 1 star.
+				if star < 2 && is_forked(repo)
 					next
 				end
 
