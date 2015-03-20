@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jincheker@gmail.com"]
 
   spec.summary       = %q{Githubber Analyzer}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.description   = %q{Fetch and analyze memebers of Github Organizations.}
   spec.homepage      = "https://github.com/steventen/hubberlyzer"
   spec.license       = "MIT"
 
