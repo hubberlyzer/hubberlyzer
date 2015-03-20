@@ -8,7 +8,7 @@ describe "Profiler" do
 
   it "fetches all people's profile urls under the organization" do
   	p = Hubberlyzer::Profiler.new
-  	links = p.githubber_links("https://github.com/orgs/github/people", 4)
+  	links = p.githubber_links("https://github.com/orgs/github/people", 4, max_concurrency: 2)
     expect(links.length).to eq(4*30)
   end
 
@@ -29,14 +29,15 @@ describe "Profiler" do
   it "fetches user repositories stats correctly" do
   	p = Hubberlyzer::Profiler.new
   	body = p.send(:fetch, "https://github.com/steventen?tab=repositories")
-  	repo_count = p.parse_repo(Nokogiri::HTML(body))
+  	repo_count = p.parse_repo_stats(Nokogiri::HTML(body))
   	expect(repo_count).to include("Ruby")
 	end
 
 	it "fetches all the information from profile page" do
 		p = Hubberlyzer::Profiler.new
 		info = p.fetch_profile_page("https://github.com/steventen")
-		expect(info).to include("profile", "stats")
+    expect(info.profile).to include("username")
+		expect(info.stats).to include("Ruby")
 	end
 
 	it "fetches multiple profile pages concurrently" do
@@ -51,7 +52,6 @@ describe "Profiler" do
 
   	p = Hubberlyzer::Profiler.new
 		info = p.fetch_profile_pages(links)
-		puts info.inspect
 		expect(info.length).to eq(links.length)
 	end
 end

@@ -1,6 +1,7 @@
 require "typhoeus"
 require "nokogiri"
 
+require 'hubberlyzer/hubber'
 require 'hubberlyzer/fetcher'
 require 'hubberlyzer/profiler'
 require 'hubberlyzer/analyzer'

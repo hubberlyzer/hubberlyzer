@@ -1,32 +1,42 @@
-# Get githubber's profile information from profile page
-# Default only fetch on page 1
-# Profile:
-# 	Full Name
-# 	Location
-# 	Email
-#   Social Account (Twitter Only)
-#   Date Of Join
-#   Number of Follower
-# Repository Summary
-#   language usage count
 module Hubberlyzer
+	# Profiler get githubber's profile information and repositories stats from their profile page.
+	#
+	# Profile:
+	# 	full name
+	#   username
+	# 	location
+	# 	email
+	#   external link
+	#   datetime of join
+	# 
+	# Repository Stats:
+	#   total count group by language
+	#   total stars group by language
 	class Profiler
+
+		# Convenient method that calls #githubber_links and #fetch_profile_pages together
+		def get_githubbers(url, max_page=1, options={})
+			links = githubber_links(url, max_page, options)
+			fetch_profile_pages(links)
+		end
+
+		# Fetch people's profile url given the url of this organization's people page
+		# Returns array of the memeber's profile url
 		# url: the link to organization's people page (e.g. https://github.com/orgs/github/people)
-		# returns all the memeber's profile page url
-		# Notice that currently it will not try to detect the max page.
-		# It will only fetch the first page if max_page is nil.
-		def githubber_links(url, max_page=nil)
+		# options: optional parameters that passe to http request client (Typhoeus)
+		def githubber_links(url, max_page=1, options={})
 			links = []
 			if max_page && max_page > 1
+
 				# add pagination param
 				urls = (1..max_page).map { |i| "#{url}?page=#{i}" }
-				responses = fetch(urls, max_concurrency: 2)
-				responses.each do |response_body|
-					links += parse_hubbers(Nokogiri::HTML(response_body))
+				responses = fetch(urls, options)
+				responses.each do |response|
+					links += get_profile_url(Nokogiri::HTML(response))
 				end
 			else
-				response_body = fetch(url)
-				links = parse_hubbers(Nokogiri::HTML(response_body))
+				response = fetch(url)
+				links = get_profile_url(Nokogiri::HTML(response))
 			end
 			links
 		end
@@ -34,28 +44,30 @@ module Hubberlyzer
 		# Fetch a user's profile page
 		def fetch_profile_page(url)
 			url = "#{url}?tab=repositories"
-			response_body = fetch(url)
-
-			parse_page(response_body)
+			response = fetch(url)
+			hubber = parse_profile_page(response)
+			hubber
 		end
 
-		# Fetch array of urls concurrently
+		# Fetch an array of user's profile urls concurrently
 		def fetch_profile_pages(urls)
 			urls = urls.map { |l| "#{l}?tab=repositories" }
 			responses = fetch(urls)
-			responses.map do |response_body|
-				parse_page(response_body)
+			hubbers = responses.map do |response|
+				parse_profile_page(response)
 			end
+			hubbers
 		end
 
-		def parse_page(body)
+		def parse_profile_page(body)
 			html = Nokogiri::HTML(body)
-			profile = parse_profile(html)
-			lang_count = parse_repo(html)
-
-			{"profile" => profile, "stats" => lang_count}
+			hubber = Hubber.new
+			hubber.profile = parse_profile(html)
+			hubber.stats = parse_repo_stats(html)
+			hubber
 		end
 		
+		# Get the basic information of this user
 		def parse_profile(html)
 			profile = {}
 			profile["username"]  = html.at_css('.vcard-username').text # Must have username, will raise error is not found
@@ -67,8 +79,11 @@ module Hubberlyzer
 			profile
 		end
 
-		def parse_repo(html)
-			lang_count = {} #calculate the total number of repos and stars written in each language. e.g. {"Ruby" => {"count" => 31, "star" => 100}}
+		# Parse and calculate the total number of repos and stars 
+		# grouped them by each language. 
+		# e.g. {"Ruby" => {"count" => 31, "star" => 100}, ...}
+		def parse_repo_stats(html)
+			lang_count = {}
 
 			html.css("li.repo-list-item").each do |repo|
 				stats = repo.at_css(".repo-list-stats").text.split
@@ -96,7 +111,7 @@ module Hubberlyzer
 		end
 
 		# Get githubbers' profile url
-		def parse_hubbers(html)
+		def get_profile_url(html)
 			links = []
 			selector = "li.member-list-item a.member-link"
 
