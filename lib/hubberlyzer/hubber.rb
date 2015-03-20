@@ -4,6 +4,10 @@ module Hubberlyzer
       @hubber = data
     end
 
+    def [](attribute)
+      @hubber[attribute]
+    end
+
     def profile
       @hubber["profile"]
     end
@@ -18,6 +22,10 @@ module Hubberlyzer
 
     def stats=(data)
       @hubber["stats"] = data
+    end
+
+    def raw
+      @hubber
     end
   end
 end

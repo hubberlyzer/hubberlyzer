@@ -4,7 +4,7 @@ module Hubberlyzer
     # The data collection is coming from Profiler#fetch_profile_pages method
     # Check spec/fixtures/sample.rb to see how it looks like
     def initialize(data)
-      @data = data
+      @data = data.is_a?(Hash) ? data : data.raw
     end
 
     # Total count and star of repositories group by language of all member
@@ -39,7 +39,7 @@ module Hubberlyzer
     # Return a list of people, who contribute to this lang
     # The contribution can either based on 'count', or 'star'
     # The list is ordered by total of 'count' or 'star' they have
-    def member_contrib(lang, base="star")
+    def member_contrib(lang, base="star", top=10)
       member = []
       @data.each do |p|
         next unless p["stats"].has_key?(lang)
@@ -52,7 +52,7 @@ module Hubberlyzer
         # sort the results
         member.sort! { |a, b|  b[base] <=> a[base] }
       end
-      member
+      member[0...top]
     end
   end
 end
