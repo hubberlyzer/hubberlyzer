@@ -50,6 +50,8 @@ describe "Analyzer" do
     p = Hubberlyzer::Analyzer.new(test_data)
     sum = p.sum_by_language
 
+    puts sum.inspect
+
     expect(sum["C"]["count"]).to eq(10)
     expect(sum["Ruby"]["count"]).to eq(10)
     expect(sum["JavaScript"]["count"]).to eq(10)
@@ -63,6 +65,8 @@ describe "Analyzer" do
     p = Hubberlyzer::Analyzer.new(test_data)
     sum = p.member_contrib("Ruby", "star")
 
+    puts sum.inspect
+
     expect(sum.length).to eq(2)
     expect(sum[0]["profile"]["username"]).to eq("bbb")
     expect(sum[1]["profile"]["username"]).to eq("aaa")
@@ -74,7 +78,7 @@ describe "Analyzer" do
   it "calculate top x language" do
     p = Hubberlyzer::Analyzer.new(test_data2)
     sum = p.top_language("count", 10)
-    
+    puts sum.inspect
     expect(sum.length).to eq(3)
     expect(sum[0][0]).to eq("C")
     expect(sum[1][0]).to eq("JavaScript")

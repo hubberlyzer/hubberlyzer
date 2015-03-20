@@ -4,11 +4,11 @@ module Hubberlyzer
     # The data collection is coming from Profiler#fetch_profile_pages method
     # Check spec/fixtures/sample.rb to see how it looks like
     def initialize(data)
-      @data = data.is_a?(Hash) ? data : data.raw
+      @data = data
     end
 
     # Total count and star of repositories group by language of all member
-    # Return a Hash
+    # Return a Hash e.g. {"Ruby"=>{"count"=>10, "star"=>10}, "JavaScript"=>{"count"=>10, "star"=>10}, ...}
     def sum_by_language
       sum = {}
       @data.each do |p|
@@ -21,7 +21,7 @@ module Hubberlyzer
 
     # Total count and star of repositories group by language of all member
     # Only top x number of language is kept with desc order
-    # Return an Array
+    # Return an Array e.g. [["C", 10], ["JavaScript", 7], ["Ruby", 6]]
     def top_language(base="count", top=30)
       sum = {}
       @data.each do |p|
@@ -39,6 +39,7 @@ module Hubberlyzer
     # Return a list of people, who contribute to this lang
     # The contribution can either based on 'count', or 'star'
     # The list is ordered by total of 'count' or 'star' they have
+    # Return e.g. [{"profile"=>{"username"=>"bbb", ...}, "star"=>10}, {"profile"=>{"username"=>"aaa", ...}, "star"=>0}]
     def member_contrib(lang, base="star", top=10)
       member = []
       @data.each do |p|
