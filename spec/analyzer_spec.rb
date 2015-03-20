@@ -47,7 +47,7 @@ describe "Analyzer" do
 
   it "calculate sum by language" do
 
-  	p = Hubberlyzer::Analyzer.new(test_data)
+    p = Hubberlyzer::Analyzer.new(test_data)
     sum = p.sum_by_language
 
     expect(sum["C"]["count"]).to eq(10)

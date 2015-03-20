@@ -9,5 +9,5 @@ require "hubberlyzer/version"
 
 module Hubberlyzer
   class ResponseError < StandardError
-	end
+  end
 end
